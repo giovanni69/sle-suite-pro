@@ -1,0 +1,84 @@
+name: Build Windows EXE
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install PySide6
+          pip install pyscard
+        shell: pwsh
+
+      # 4️⃣ Install UPX per compressione
+      - name: Install UPX
+        run: |
+          choco install upx -y
+        shell: pwsh
+
+      # 5️⃣ Copia cartelle e build EXE
+      - name: Build EXE with PyInstaller
+        run: |
+          # Creazione cartelle
+          mkdir dist
+          mkdir dist/assets
+          mkdir dist/controllers
+          mkdir dist/core
+          mkdir dist/drivers
+          mkdir dist/gui
+          mkdir dist/i18n
+          mkdir dist/model
+
+          # Copia risorse
+          Copy-Item -Recurse -Force assets/* dist/assets/
+          Copy-Item -Recurse -Force controllers/* dist/controllers/
+          Copy-Item -Recurse -Force core/* dist/core/
+          Copy-Item -Recurse -Force drivers/* dist/drivers/
+          Copy-Item -Recurse -Force gui/* dist/gui/
+          Copy-Item -Recurse -Force i18n/* dist/i18n/
+          Copy-Item -Recurse -Force model/* dist/model/
+
+          # Creazione EXE con icona e compressione UPX
+          pyinstaller --onefile --windowed --name sle-suite-pro `
+                      --icon "assets/logo.ico" `
+                      --add-data "assets;assets" `
+                      --add-data "controllers;controllers" `
+                      --add-data "core;core" `
+                      --add-data "drivers;drivers" `
+                      --add-data "gui;gui" `
+                      --add-data "i18n;i18n" `
+                      --add-data "model;model" `
+                      --collect-submodules PySide6.QtWidgets `
+                      --collect-submodules PySide6.QtGui `
+                      --collect-submodules PySide6.QtCore `
+                      --collect-all pyscard `
+                      --upx-dir "C:\ProgramData\chocolatey\bin" `
+                      app.py
+        shell: pwsh
+
+      # 6️⃣ Upload EXE come artifact
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sle-suite-pro-windows
+          path: dist/sle-suite-pro.exe
