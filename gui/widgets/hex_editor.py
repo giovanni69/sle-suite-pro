@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QWidget, QGridLayout, QLineEdit, QLabel, QScrollArea, QVBoxLayout, QFrame
 from PySide6.QtCore import Qt
+import re
 
 
 class HexEditor(QWidget):
@@ -147,8 +148,9 @@ class HexEditor(QWidget):
             self.ascii_rows.append(ascii_line)
 
             row += 1
-        self.force_black_text()
-        self.force_ascii_black()
+
+        # Force black color on all headers
+        self.force_headers_black()
 
     def write_cell(self, index: int, new_text: str):
         row = index // 16
@@ -218,33 +220,25 @@ class HexEditor(QWidget):
                     break
                 self.write_cell(index, cell.text())
 
-    def force_black_text(self):
+    def force_headers_black(self):
         """
-        Force black color on vertical and horizontal offset headers
+        Force black color on all headers:
+        - Vertical and horizontal offset headers
+        - 'ASCII' label
+        Keeps other styles intact.
         """
-        for lbl in self.offset_labels + getattr(self, "offset_headers", []):
-            # Keeps other styles but forces the text color to black
+        all_headers = self.offset_labels + getattr(self, "offset_headers", [])
+        if hasattr(self, "ascii_header_label") and self.ascii_header_label:
+            all_headers.append(self.ascii_header_label)
+
+        for lbl in all_headers:
             current_style = lbl.styleSheet()
             if "color:" in current_style:
-                # Replace any existing color
-                import re
                 new_style = re.sub(r"color:\s*[^;]+;", "color: black;", current_style)
             else:
                 new_style = current_style + " color: black;"
             lbl.setStyleSheet(new_style)
 
-    def force_ascii_black(self):
-        """
-        Force black color only on the ‘ASCII’ label
-        """
-        if hasattr(self, "ascii_header_label") and self.ascii_header_label:
-            current_style = self.ascii_header_label.styleSheet()
-            if "color:" in current_style:
-                import re
-                new_style = re.sub(r"color:\s*[^;]+;", "color: black;", current_style)
-            else:
-                new_style = current_style + " color: black;"
-            self.ascii_header_label.setStyleSheet(new_style)
 
 class _HexCell(QLineEdit):
     def __init__(self, editor: HexEditor, index: int, text: str):
