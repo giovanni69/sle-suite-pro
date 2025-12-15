@@ -25,7 +25,7 @@ class BaseCard:
 
         if sw1 != 0x90:
             msg_tr = tr("log.sw_error")
-            msg = f"{msg_tr} SW={sw1:02X}{sw2:02X} en {desc}"
+            msg = f"{msg_tr} SW={sw1:02X}{sw2:02X} in {desc}"
             self._log(f">> {msg}")
             raise Exception(msg)
 
