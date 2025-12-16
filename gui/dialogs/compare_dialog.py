@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QPushButton,
-    QFileDialog, QLabel, QSplitter, QAbstractScrollArea
+    QFileDialog, QLabel, QSplitter
 )
 from PySide6.QtCore import Qt
 from gui.widgets.hex_editor import HexEditor
@@ -18,9 +18,9 @@ class CompareDialog(QDialog):
         self.left_editor = HexEditor()
         self.right_editor = HexEditor()
 
-        # 🔴 NASCONDE LE SCROLLBAR INTERNE (SE ESISTONO)
-        self._hide_scrollbars(self.left_editor)
-        self._hide_scrollbars(self.right_editor)
+        # Scrollbar sempre visibili se necessario
+        self._show_scrollbars(self.left_editor)
+        self._show_scrollbars(self.right_editor)
 
         self.left_editor.setEnabled(False)
         self.right_editor.setEnabled(False)
@@ -46,26 +46,22 @@ class CompareDialog(QDialog):
 
         self.btn_second = QPushButton(parent.tr("compare.select_second"))
         self.btn_second.clicked.connect(self.load_second_file)
-        self.btn_second.setEnabled(False)  # Disabilitato finché non carichi il primo
+        self.btn_second.setEnabled(False)
         controls.addWidget(self.btn_second)
-
-        self.btn_reset = QPushButton(parent.tr("compare.reset"))
-        self.btn_reset.clicked.connect(self.reset_comparison)
-        self.btn_reset.setEnabled(False)
-        controls.addWidget(self.btn_reset)
 
         self.first_data = None
         self.second_data = None
 
     # -------------------------------------------------
-
-    def _hide_scrollbars(self, widget):
-        for area in widget.findChildren(QAbstractScrollArea):
-            area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    def _show_scrollbars(self, widget):
+        """Mostra scrollbar verticali e orizzontali quando necessario."""
+        for area in widget.findChildren(HexEditor):
+            if hasattr(area, 'setHorizontalScrollBarPolicy'):
+                area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            if hasattr(area, 'setVerticalScrollBarPolicy'):
+                area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
     # -------------------------------------------------
-
     def load_first_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self,
@@ -87,8 +83,7 @@ class CompareDialog(QDialog):
         self.right_editor.setEnabled(False)
         self.second_data = None
 
-        self.btn_second.setEnabled(True)  # Ora il secondo file si può caricare
-        self.btn_reset.setEnabled(False)
+        self.btn_second.setEnabled(True)
         self.label_info.setText(
             self.parent_window.tr("compare.loaded_first").format(path=path)
         )
@@ -117,14 +112,12 @@ class CompareDialog(QDialog):
         self.right_editor.load_data(self.second_data)
 
         self.highlight_differences()
-        self.btn_reset.setEnabled(True)  # Abilita Reset ora che c’è un confronto
 
         self.label_info.setText(
             self.parent_window.tr("compare.loaded_second").format(path=path)
         )
 
     # -------------------------------------------------
-
     def highlight_differences(self):
         if not self.first_data or not self.second_data:
             return
@@ -164,21 +157,3 @@ class CompareDialog(QDialog):
             cell.setToolTip(
                 self.parent_window.tr("compare.extra_byte")
             )
-
-    # -------------------------------------------------
-
-    def reset_comparison(self):
-        self.left_editor.clear()
-        self.right_editor.clear()
-
-        self.left_editor.setEnabled(False)
-        self.right_editor.setEnabled(False)
-
-        self.first_data = None
-        self.second_data = None
-
-        self.btn_second.setEnabled(False)  # Disabilita il secondo file
-        self.btn_reset.setEnabled(False)
-        self.label_info.setText(
-            self.parent_window.tr("compare.select_files")
-        )
