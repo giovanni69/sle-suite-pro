@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QPushButton,
-    QFileDialog, QLabel, QSplitter
+    QFileDialog, QLabel, QSplitter, QAbstractScrollArea
 )
 from PySide6.QtCore import Qt
 from gui.widgets.hex_editor import HexEditor
@@ -11,7 +11,6 @@ class CompareDialog(QDialog):
         super().__init__(parent)
         self.parent_window = parent
 
-        # Window setup
         self.setWindowTitle(parent.tr("compare.title"))
         self.resize(1000, 600)
 
@@ -19,13 +18,19 @@ class CompareDialog(QDialog):
         self.left_editor = HexEditor()
         self.right_editor = HexEditor()
 
+        # 🔴 NASCONDE LE SCROLLBAR INTERNE (SE ESISTONO)
+        self._hide_scrollbars(self.left_editor)
+        self._hide_scrollbars(self.right_editor)
+
+        self.left_editor.setEnabled(False)
+        self.right_editor.setEnabled(False)
+
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(self.left_editor)
         splitter.addWidget(self.right_editor)
         splitter.setSizes([500, 500])
 
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        layout = QVBoxLayout(self)
         layout.addWidget(splitter)
 
         # Controls
@@ -45,10 +50,20 @@ class CompareDialog(QDialog):
 
         self.btn_reset = QPushButton(parent.tr("compare.reset"))
         self.btn_reset.clicked.connect(self.reset_comparison)
+        self.btn_reset.setEnabled(False)
         controls.addWidget(self.btn_reset)
 
         self.first_data = None
         self.second_data = None
+
+    # -------------------------------------------------
+
+    def _hide_scrollbars(self, widget):
+        for area in widget.findChildren(QAbstractScrollArea):
+            area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    # -------------------------------------------------
 
     def load_first_file(self):
         path, _ = QFileDialog.getOpenFileName(
@@ -57,15 +72,30 @@ class CompareDialog(QDialog):
             "",
             self.parent_window.tr("compare.binary_files")
         )
-        if path:
-            with open(path, "rb") as f:
-                self.first_data = f.read()
-            self.left_editor.load_data(self.first_data)
-            self.label_info.setText(self.parent_window.tr("compare.loaded_first").format(path=path))
+        if not path:
+            return
+
+        with open(path, "rb") as f:
+            self.first_data = f.read()
+
+        self.left_editor.clear()
+        self.left_editor.setEnabled(True)
+        self.left_editor.load_data(self.first_data)
+
+        self.right_editor.clear()
+        self.right_editor.setEnabled(False)
+        self.second_data = None
+
+        self.btn_reset.setEnabled(False)
+        self.label_info.setText(
+            self.parent_window.tr("compare.loaded_first").format(path=path)
+        )
 
     def load_second_file(self):
         if self.first_data is None:
-            self.label_info.setText(self.parent_window.tr("compare.load_first_first"))
+            self.label_info.setText(
+                self.parent_window.tr("compare.load_first_first")
+            )
             return
 
         path, _ = QFileDialog.getOpenFileName(
@@ -74,53 +104,78 @@ class CompareDialog(QDialog):
             "",
             self.parent_window.tr("compare.binary_files")
         )
-        if path:
-            with open(path, "rb") as f:
-                self.second_data = f.read()
-            self.right_editor.load_data(self.second_data)
-            self.label_info.setText(self.parent_window.tr("compare.loaded_second").format(path=path))
-            self.highlight_differences()
+        if not path:
+            return
+
+        with open(path, "rb") as f:
+            self.second_data = f.read()
+
+        self.right_editor.clear()
+        self.right_editor.setEnabled(True)
+        self.right_editor.load_data(self.second_data)
+
+        self.highlight_differences()
+        self.btn_reset.setEnabled(True)
+
+        self.label_info.setText(
+            self.parent_window.tr("compare.loaded_second").format(path=path)
+        )
+
+    # -------------------------------------------------
 
     def highlight_differences(self):
-        """Highlight differences between the two loaded dumps."""
         if not self.first_data or not self.second_data:
             return
 
         min_len = min(len(self.first_data), len(self.second_data))
+
         for idx in range(min_len):
-            val_left = self.first_data[idx]
-            val_right = self.second_data[idx]
+            if self.first_data[idx] == self.second_data[idx]:
+                continue
 
             row = idx // 16
             col = idx % 16
 
             try:
-                cell_right = self.right_editor.cells[row][col]
-            except IndexError:
+                cell = self.right_editor.cells[row][col]
+            except Exception:
                 continue
 
-            if val_left != val_right:
-                # Highlight difference in red text
-                cell_right.setStyleSheet(
-                    "background-color: #ffcccc; color: red; font-family: monospace;"
-                )
-                cell_right.setToolTip(f"{self.parent_window.tr('compare.original')}: {val_left:02X}")
+            cell.setStyleSheet(
+                "background-color: #ffcccc; color: red; font-family: monospace;"
+            )
+            cell.setToolTip(
+                f"{self.parent_window.tr('compare.original')}: {self.first_data[idx]:02X}"
+            )
 
-        # Highlight extra bytes if second dump is longer
         for idx in range(len(self.first_data), len(self.second_data)):
             row = idx // 16
             col = idx % 16
             try:
-                cell_right = self.right_editor.cells[row][col]
-            except IndexError:
+                cell = self.right_editor.cells[row][col]
+            except Exception:
                 continue
-            cell_right.setStyleSheet("background-color: #ffcccc; color: red; font-family: monospace;")
-            cell_right.setToolTip(self.parent_window.tr("compare.extra_byte"))
+
+            cell.setStyleSheet(
+                "background-color: #ffcccc; color: red; font-family: monospace;"
+            )
+            cell.setToolTip(
+                self.parent_window.tr("compare.extra_byte")
+            )
+
+    # -------------------------------------------------
 
     def reset_comparison(self):
-        """Reset both editors to original state."""
-        if self.first_data:
-            self.left_editor.load_data(self.first_data)
-        if self.second_data:
-            self.right_editor.load_data(self.second_data)
-        self.label_info.setText(self.parent_window.tr("compare.reset_done"))
+        self.left_editor.clear()
+        self.right_editor.clear()
+
+        self.left_editor.setEnabled(False)
+        self.right_editor.setEnabled(False)
+
+        self.first_data = None
+        self.second_data = None
+
+        self.btn_reset.setEnabled(False)
+        self.label_info.setText(
+            self.parent_window.tr("compare.select_files")
+        )
