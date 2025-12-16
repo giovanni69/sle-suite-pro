@@ -18,10 +18,9 @@ jobs:
           ref: develop
           fetch-depth: 0
 
-      # 2️⃣ Verifica di sicurezza (opzionale ma consigliata)
+      # 2️⃣ Verifica di sicurezza
       - name: Verify branch
-        run: |
-          git branch --show-current
+        run: git branch --show-current
         shell: pwsh
 
       # 3️⃣ Setup Python
@@ -41,31 +40,22 @@ jobs:
 
       # 5️⃣ Install UPX
       - name: Install UPX
-        run: |
-          choco install upx -y
+        run: choco install upx -y
         shell: pwsh
 
-      # 6️⃣ Build EXE
-      - name: Build EXE with PyInstaller
+      # 6️⃣ Rimozione __pycache__ (best practice)
+      - name: Remove __pycache__ directories
+        shell: pwsh
         run: |
-          mkdir dist
-          mkdir dist/assets
-          mkdir dist/controllers
-          mkdir dist/core
-          mkdir dist/drivers
-          mkdir dist/gui
-          mkdir dist/i18n
-          mkdir dist/model
+          Get-ChildItem -Recurse -Directory -Filter "__pycache__" |
+            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
-          Copy-Item -Recurse -Force assets/* dist/assets/
-          Copy-Item -Recurse -Force controllers/* dist/controllers/
-          Copy-Item -Recurse -Force core/* dist/core/
-          Copy-Item -Recurse -Force drivers/* dist/drivers/
-          Copy-Item -Recurse -Force gui/* dist/gui/
-          Copy-Item -Recurse -Force i18n/* dist/i18n/
-          Copy-Item -Recurse -Force model/* dist/model/
-
-          pyinstaller --onefile --windowed --name sle-suite-pro `
+      # 7️⃣ Build EXE con PyInstaller ottimizzato
+      - name: Build EXE with PyInstaller
+        shell: pwsh
+        run: |
+          pyinstaller --onefile --windowed --clean `
+            --name sle-suite-pro `
             --icon "assets/logo.ico" `
             --add-data "assets;assets" `
             --add-data "controllers;controllers" `
@@ -74,15 +64,20 @@ jobs:
             --add-data "gui;gui" `
             --add-data "i18n;i18n" `
             --add-data "model;model" `
-            --collect-submodules PySide6.QtWidgets `
-            --collect-submodules PySide6.QtGui `
-            --collect-submodules PySide6.QtCore `
+            --hidden-import PySide6.QtWidgets `
+            --hidden-import PySide6.QtGui `
+            --hidden-import PySide6.QtCore `
+            --exclude-module PySide6.QtQml `
+            --exclude-module PySide6.QtQuick `
+            --exclude-module PySide6.QtNetwork `
+            --exclude-module PySide6.QtOpenGL `
+            --exclude-module PySide6.QtSvg `
+            --exclude-module PySide6.QtXml `
             --collect-all pyscard `
             --upx-dir "C:\ProgramData\chocolatey\bin" `
             app.py
-        shell: pwsh
 
-      # 7️⃣ Upload artifact
+      # 8️⃣ Upload artifact
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
