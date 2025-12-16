@@ -348,7 +348,9 @@ class MainWindow(QMainWindow):
         self.settings.set("theme", theme)
         is_dark = (theme == "dark")
         self.log_panel.set_dark_mode(is_dark)
-        self.log(f"{self.tr('msg.theme_changed')}: {theme}")
+        themes_it = {"light": "chiaro", "dark": "scuro"}
+        self.log(f"{self.tr('msg.theme_changed')}: {themes_it.get(theme, theme)}")
+        #self.log(f"{self.tr('msg.theme_changed')}: {theme}")
 
     #def update_language(self, lang: str):
     #    self.settings.set("language", lang)
