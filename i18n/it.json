@@ -285,7 +285,7 @@
     "compare.select_files": "Seleziona due file binari da confrontare:",
     "compare.select_first": "Seleziona primo file",
     "compare.select_second": "Seleziona secondo file",
-    "compare.reset": "Reset confronto",
+    "compare.reset": "Resetta confronto",
     "compare.loaded_first": "Primo file caricato: {path}",
     "compare.loaded_second": "Secondo file caricato: {path}",
     "compare.load_first_before_second": "Carica prima il primo file prima di selezionare il secondo.",
