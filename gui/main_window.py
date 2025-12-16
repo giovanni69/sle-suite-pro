@@ -32,8 +32,10 @@ class MainWindow(QMainWindow):
 
         self.settings = SettingsManager()
         lang_code = self.settings.get("language", "it")
-        self.lang = LanguageManager(lang_code)
-        init_language(lang_code)
+        #self.lang = LanguageManager(lang_code)
+        self.lang = LanguageManager("it")
+        #init_language(lang_code)
+        init_language("it")
         self.pcsc = PCSCManager()
 
         self.controller = AppController(
@@ -135,11 +137,11 @@ class MainWindow(QMainWindow):
         theme_menu.addAction(self.tr("theme.light")).triggered.connect(lambda: self.update_theme("light"))
         theme_menu.addAction(self.tr("theme.dark")).triggered.connect(lambda: self.update_theme("dark"))
 
-        lang_menu = settings_menu.addMenu(self.tr("menu.language"))
-        for lang_code in self.settings.available_langs:
-            lang_menu.addAction(lang_code).triggered.connect(
-                lambda checked, c=lang_code: self.update_language(c)
-            )
+        #lang_menu = settings_menu.addMenu(self.tr("menu.language"))
+        #for lang_code in self.settings.available_langs:
+        #    lang_menu.addAction(lang_code).triggered.connect(
+        #        lambda checked, c=lang_code: self.update_language(c)
+        #    )
 
         help_menu = menu.addMenu(self.tr("menu.help"))
         help_menu.addAction(self.tr("menu.about")).triggered.connect(self.action_about)
@@ -348,16 +350,16 @@ class MainWindow(QMainWindow):
         self.log_panel.set_dark_mode(is_dark)
         self.log(f"{self.tr('msg.theme_changed')}: {theme}")
 
-    def update_language(self, lang: str):
-        self.settings.set("language", lang)
-        self.lang.load(lang)
-        init_language(lang)
+    #def update_language(self, lang: str):
+    #    self.settings.set("language", lang)
+    #    self.lang.load(lang)
+    #    init_language(lang)
 
-        QMessageBox.information(
-            self,
-            self.tr("msg.information"),
-            self.tr("msg.restart_needed"),
-        )
+    #    QMessageBox.information(
+    #        self,
+    #        self.tr("msg.information"),
+    #        self.tr("msg.restart_needed"),
+    #    )
 
 
     def retranslate_ui(self):

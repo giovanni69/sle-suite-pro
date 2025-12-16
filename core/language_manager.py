@@ -6,7 +6,7 @@ _language_manager = None
 
 
 class LanguageManager:
-    def __init__(self, lang="es"):
+    def __init__(self, lang="it"):
         self.current_lang = lang
         self.data = {}
         self.fallback = {}
@@ -29,7 +29,7 @@ class LanguageManager:
         return sorted(langs)
 
     def _load_fallback(self):
-        path = resource_path("i18n/es.json")
+        path = resource_path("i18n/it.json")
 
         with open(path, "r", encoding="utf-8") as f:
             self.fallback = json.load(f)
@@ -54,7 +54,7 @@ class LanguageManager:
         return key
 
 
-def init_language(lang="es"):
+def init_language(lang="it"):
     global _language_manager
     _language_manager = LanguageManager(lang)
 
@@ -62,5 +62,5 @@ def init_language(lang="es"):
 def tr(key):
     global _language_manager
     if _language_manager is None:
-        init_language("es")
+        init_language("it")
     return _language_manager.tr(key)

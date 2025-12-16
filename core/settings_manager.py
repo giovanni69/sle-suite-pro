@@ -19,7 +19,7 @@ class SettingsManager:
 
         self.data = {
             "theme": "dark",
-            "language": "es",
+            "language": "it",
             "accent_color": "#00aaff",
             "reader_preference": None,
         }
@@ -49,7 +49,7 @@ class SettingsManager:
             self.data["theme"] = "dark"
 
         if self.data.get("language") not in self.available_langs:
-            self.data["language"] = "es"
+            self.data["language"] = "it"
 
     def get(self, key, default=None):
         return self.data.get(key, default)
