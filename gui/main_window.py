@@ -50,8 +50,8 @@ class MainWindow(QMainWindow):
         self.current_theme = theme
         self.setStyleSheet(THEMES.get(theme, THEMES["dark"]))
 
-        self._build_menu_bar()
         self._build_central_widgets()
+        self._build_menu_bar()
         self._build_status_bar()
 
         self.thread = QThread(self)
@@ -124,6 +124,8 @@ class MainWindow(QMainWindow):
         file_menu = menu.addMenu(self.tr("menu.file"))
         file_menu.addAction(self.tr("menu.import_bin")).triggered.connect(self.action_import_bin)
         file_menu.addAction(self.tr("menu.export_bin")).triggered.connect(self.action_export_bin)
+        file_menu.addSeparator()
+        file_menu.addAction(self.tr("Compare Dumps")).triggered.connect(self.tab_card.open_compare_dialog)
         file_menu.addSeparator()
         file_menu.addAction(self.tr("menu.exit")).triggered.connect(self.close)
 

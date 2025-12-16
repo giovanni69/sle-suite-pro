@@ -11,6 +11,7 @@ from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtCore import QRegularExpression
 
 from gui.widgets.hex_editor import HexEditor
+from gui.dialogs.compare_dialog import CompareDialog
 
 
 class TabCard(QWidget):
@@ -199,3 +200,7 @@ class TabCard(QWidget):
 
         except Exception as e:
             self.main.log(f"{self.tr('msg.error_psc')} {e}")
+
+    def open_compare_dialog(self):
+        dialog = CompareDialog(self.hex)
+        dialog.exec()

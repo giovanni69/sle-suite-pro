@@ -220,6 +220,76 @@ class HexEditor(QWidget):
                     break
                 self.write_cell(index, cell.text())
 
+    def clear_comparison(self):
+        """Remove comparison highlights from all cells."""
+        for row in self.cells:
+            for cell in row:
+                # Restore default style (keep monospace)
+                cell.setStyleSheet("font-family: monospace;")
+        # Show ASCII column again
+        self.show_ascii()
+
+    def compare_with(self, other_data: bytes):
+        """
+        Compare current data with another binary dump and highlight differences.
+        Differences are shown with a red background.
+        The ASCII column is hidden during comparison.
+        """
+        self.clear_comparison()  # Remove previous highlights
+        self.hide_ascii()        # Hide ASCII column
+
+        min_len = min(len(self.data), len(other_data))
+
+        # Compare overlapping bytes
+        for idx in range(min_len):
+            current_val = self.data[idx]
+            other_val = other_data[idx]
+
+            row = idx // 16
+            col = idx % 16
+
+            try:
+                cell = self.cells[row][col]
+            except IndexError:
+                continue
+
+            if current_val != other_val:
+                # Highlight differences with red background
+                cell.setStyleSheet(
+                    "background-color: #ffcccc; font-family: monospace;"
+                )
+            else:
+                # Keep default style
+                cell.setStyleSheet("font-family: monospace;")
+
+        # Highlight extra bytes if other_data is longer
+        if len(other_data) > len(self.data):
+            for idx in range(len(self.data), len(other_data)):
+                row = idx // 16
+                col = idx % 16
+                try:
+                    cell = self.cells[row][col]
+                except IndexError:
+                    continue
+                cell.setStyleSheet(
+                    "background-color: #ffcccc; font-family: monospace;"
+                )
+
+    def hide_ascii(self):
+        """Hide ASCII column during comparison."""
+        if hasattr(self, "ascii_header_label"):
+            self.ascii_header_label.hide()
+        for line in self.ascii_rows:
+            line.hide()
+
+
+    def show_ascii(self):
+        """Show ASCII column."""
+        if hasattr(self, "ascii_header_label"):
+            self.ascii_header_label.show()
+        for line in self.ascii_rows:
+            line.show()
+
     def force_headers_black(self):
         """
         Force black color on all headers:
