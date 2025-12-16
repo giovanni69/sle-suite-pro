@@ -69,7 +69,8 @@ class MainWindow(QMainWindow):
         icon_path = resource_path("assets/logo.ico")
         self.setWindowIcon(QIcon(icon_path))
         self.refresh_readers()
-        QTimer.singleShot(200, lambda: AboutDialog(self, self.tr).exec())
+        # Show About dialog on startup
+        # QTimer.singleShot(200, lambda: AboutDialog(self, self.tr).exec())
 
     def closeEvent(self, event):
         try:
