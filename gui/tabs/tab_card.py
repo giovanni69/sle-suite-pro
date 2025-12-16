@@ -202,5 +202,5 @@ class TabCard(QWidget):
             self.main.log(f"{self.tr('msg.error_psc')} {e}")
 
     def open_compare_dialog(self):
-        dialog = CompareDialog(self.hex)
+        dialog = CompareDialog(self.main)
         dialog.exec()

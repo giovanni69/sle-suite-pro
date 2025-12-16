@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.settings = SettingsManager()
-        lang_code = self.settings.get("language", "es")
+        lang_code = self.settings.get("language", "it")
         self.lang = LanguageManager(lang_code)
         init_language(lang_code)
         self.pcsc = PCSCManager()
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         file_menu.addAction(self.tr("menu.import_bin")).triggered.connect(self.action_import_bin)
         file_menu.addAction(self.tr("menu.export_bin")).triggered.connect(self.action_export_bin)
         file_menu.addSeparator()
-        file_menu.addAction(self.tr("Compare Dumps")).triggered.connect(self.tab_card.open_compare_dialog)
+        file_menu.addAction(self.tr("menu.compare_dumps")).triggered.connect(self.tab_card.open_compare_dialog)
         file_menu.addSeparator()
         file_menu.addAction(self.tr("menu.exit")).triggered.connect(self.close)
 

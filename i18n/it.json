@@ -280,5 +280,18 @@
     "msg.psc_invalid_format": "Formato PIN non valido.",
     "msg.warning": "Attenzione!",
     "msg.support_text": "Se questo strumento ti è utile, una stella o un caffè mi motiva a migliorarlo.",
-    "msg.buy_me_coffee": "Offrimi un caffè"
+    "msg.buy_me_coffee": "Offrimi un caffè",
+    "compare.title": "Confronta dump binari",
+    "compare.select_files": "Seleziona due file binari da confrontare:",
+    "compare.select_first": "Seleziona primo file",
+    "compare.select_second": "Seleziona secondo file",
+    "compare.reset": "Reset confronto",
+    "compare.loaded_first": "Primo file caricato: {path}",
+    "compare.loaded_second": "Secondo file caricato: {path}",
+    "compare.load_first_before_second": "Carica prima il primo file prima di selezionare il secondo.",
+    "compare.original": "Valore originale",
+    "compare.extra_byte": "Byte extra",
+    "compare.reset_done": "Confronto resettato.",
+    "compare.binary_files": "File binari (*.bin);;Tutti i file (*)",
+    "menu.compare_dumps": "Confronta dump"
 }
