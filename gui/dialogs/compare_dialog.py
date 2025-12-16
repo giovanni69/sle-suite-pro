@@ -46,6 +46,7 @@ class CompareDialog(QDialog):
 
         self.btn_second = QPushButton(parent.tr("compare.select_second"))
         self.btn_second.clicked.connect(self.load_second_file)
+        self.btn_second.setEnabled(False)  # Disabilitato finché non carichi il primo
         controls.addWidget(self.btn_second)
 
         self.btn_reset = QPushButton(parent.tr("compare.reset"))
@@ -86,6 +87,7 @@ class CompareDialog(QDialog):
         self.right_editor.setEnabled(False)
         self.second_data = None
 
+        self.btn_second.setEnabled(True)  # Ora il secondo file si può caricare
         self.btn_reset.setEnabled(False)
         self.label_info.setText(
             self.parent_window.tr("compare.loaded_first").format(path=path)
@@ -115,7 +117,7 @@ class CompareDialog(QDialog):
         self.right_editor.load_data(self.second_data)
 
         self.highlight_differences()
-        self.btn_reset.setEnabled(True)
+        self.btn_reset.setEnabled(True)  # Abilita Reset ora che c’è un confronto
 
         self.label_info.setText(
             self.parent_window.tr("compare.loaded_second").format(path=path)
@@ -175,6 +177,7 @@ class CompareDialog(QDialog):
         self.first_data = None
         self.second_data = None
 
+        self.btn_second.setEnabled(False)  # Disabilita il secondo file
         self.btn_reset.setEnabled(False)
         self.label_info.setText(
             self.parent_window.tr("compare.select_files")
