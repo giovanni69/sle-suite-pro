@@ -13,7 +13,7 @@ class CardWorker(QObject):
     def read_card(self):
         try:
             ctype = self.controller.detect_card_type()
-            self.log.emit(f"Tipo de tarjeta: {ctype}")
+            self.log.emit(f"Tipo di carta: {ctype}")
             data = self.controller.load_card(ctype)
             self.finished.emit(data)
         except Exception as e:

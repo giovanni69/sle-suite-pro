@@ -37,7 +37,7 @@ class SettingsManager:
                     if k in loaded:
                         self.data[k] = loaded[k]
             except Exception:
-                print("Settings corruptos, usando defaults.")
+                print("Impostazioni corrotte, uso dei valori predefiniti.")
 
     def save(self):
         os.makedirs(os.path.dirname(self.path), exist_ok=True)

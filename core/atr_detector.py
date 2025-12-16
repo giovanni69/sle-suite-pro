@@ -22,7 +22,7 @@ class ATRDetector:
             return CardType.SLE4442
 
         if atr[:4] == [0x3B, 0x04, 0x92, 0x23]:
-            if logger: logger("Detectado por ATR → SLE4428")
+            if logger: logger("Rilevata tramite ATR → SLE4428")
             return CardType.SLE4428
 
      
