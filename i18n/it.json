@@ -88,7 +88,7 @@
     "log.security_blocked": "Carta bloccata (contatore=0).",
     "log.security_counter": "Tentativi rimasti",
     "log.security_memory_raw": "Memoria di sicurezza (PSC grezzo)",
-    "log.select_file": "Select File inviato.",
+    "log.select_file": "Il file selezionato è stato inviato.",
     "log.start_brute_2byte": "Avvio brute force per PIN a 2 byte (4428/5528)...",
     "log.start_psc_recovery": "Avvio recupero PIN...",
     "log.sw_error": "Errore SW",
@@ -192,8 +192,8 @@
     "error.unsupported_card_type": "Tipo di carta non supportato",
     "error.no_connection": "Nessuna connessione attiva al lettore.",
     "error.no_memory_export": "Nessuna memoria da esportare.",
-    "msg.detected_4442": "Rilevato da ATR → SLE4442",
-    "msg.detected_4428": "Rilevato da ATR → SLE4428",
+    "msg.detected_4442": "Rilevato tramite ATR → SLE4442",
+    "msg.detected_4428": "Rilevato tramite ATR → SLE4428",
     "msg.atr_unknown": "ATR non corrisponde a pattern noti.",
     "error.no_card_inserted": "Nessuna carta inserita.",
     "error.transmit_apdu": "Errore trasmissione APDU:",
@@ -293,5 +293,6 @@
     "compare.extra_byte": "Byte extra",
     "compare.reset_done": "Confronto resettato.",
     "compare.binary_files": "File binari (*.bin);;Tutti i file (*)",
-    "menu.compare_dumps": "Confronta dump"
+    "menu.compare_dumps": "Confronta dump",
+    "msg.reading_card": "Lettura della carta in corso..."
 }
